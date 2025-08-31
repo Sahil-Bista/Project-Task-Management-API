@@ -4,4 +4,4 @@ import { requestValidation } from "../../middlewares/validation.js";
 
 export const userRouter = Router();
 
-userRouter.get('/register', requestValidation ,registerUser );
+userRouter.post('/register', requestValidation ,registerUser );
