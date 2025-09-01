@@ -21,7 +21,6 @@ export const deleteProject = async(req , res)=>{
         const userId = req.user;
         const userRole = req.roles;
         const isAdmin = userRole.includes('Admin');
-        console.log(isAdmin);
         const {projectId} = req.params;
         const foundProject = await ProjectModel.findById(projectId);
         if(!foundProject){
