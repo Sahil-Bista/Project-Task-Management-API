@@ -44,3 +44,17 @@ export const registerValidator = [
             return true;
         })
 ]
+
+export const loginValidator = [
+    body("email")
+        .trim()
+        .normalizeEmail()
+        .notEmpty()
+        .isEmail()
+        .withMessage('Please enter a valid email address'),
+
+    body("password")
+        .trim()
+        .isLength({gt : 6})
+        .withMessage('Password must be at least 7 letters')
+]
