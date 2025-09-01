@@ -5,9 +5,6 @@ import { UserModel } from '../models/User.js';
 export const loginUser = async (req,res)=>{
     try{
         const { email, password } = req.body;
-        if (!email || !password){
-            return res.status(400).json({msg:'Email and password required'});
-        }
         const user = await UserModel.findOne({email});
         if(!user){
             return res.status(404).json({msg:'No such user in the system, Please register before logging in'})

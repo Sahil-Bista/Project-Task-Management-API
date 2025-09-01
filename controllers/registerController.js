@@ -4,9 +4,6 @@ import bcrypt from 'bcrypt';
 export const registerUser = async(req , res) =>{
     try{
         const {email ,password ,firstName ,lastName ,phoneNumber} = req.body;
-        if(!email || !password || !firstName || !lastName || !phoneNumber){
-            return res.status(400).json({msg:"All fields required"});
-        }
         const duplicate = await UserModel.findOne({email});
         if(duplicate){
             return res.status(409).json({msg:'A user with the same email already exists'});
