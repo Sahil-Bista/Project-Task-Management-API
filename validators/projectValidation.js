@@ -11,7 +11,7 @@ export const createProjectValidation = [
     body("description")
         .trim()
         .escape()
-        .isLength({gt : 20})
+        .isLength({min : 20})
         .withMessage('Project Descrtiption should at least be 20 letters long'),
         
     body("members")

@@ -10,7 +10,7 @@ export const registerValidator = [
     
     body("password")
         .trim()
-        .isLength({gt : 6})
+        .isLength({min : 6})
         .withMessage('Password must be at least 7 letters'),
     
     body("firstName")
