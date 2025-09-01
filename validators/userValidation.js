@@ -5,7 +5,6 @@ export const registerValidator = [
         .trim()
         .normalizeEmail()
         .notEmpty()
-        .unique()
         .isEmail()
         .withMessage('Please entet a valid email'),
     
