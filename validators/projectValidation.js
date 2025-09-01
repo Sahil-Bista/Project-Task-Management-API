@@ -34,3 +34,10 @@ export const deleteProjectValidaiton = [
         .isMongoId()
         .withMessage('The project Id must be a valid mongo object id')
 ];
+
+export const getProjectValidaiton = [
+    param("projectId")
+        .notEmpty()
+        .isMongoId()
+        .withMessage('The project Id must be a valid mongo object id')
+];

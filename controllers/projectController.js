@@ -30,6 +30,27 @@ export const getUserProject = async(req , res)=>{
     }
 }
 
+export const getProjectDetails = async(req , res)=>{
+    try{
+        const userId = req.user;
+        const userRoles = req.roles;
+        const isAdmin = userRoles.includes('Admin');
+        const { projectId } = req.params;
+        const foundProject = await ProjectModel.findById(projectId);
+        if(!foundProject){
+            return res.status(404).json({msg : 'No such Project'});
+        }
+        const projectMembers = foundProject.members;
+        if (!projectMembers.some(id => id.toString() === userId) && !isAdmin){
+            return res.status(403).json({msg:'User unauthorized to access the project details'})
+        }
+        return res.json({msg:'Project retrieved successfully', data : foundProject});
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({msg:"Internal Server Error"});
+    }
+}
+
 export const deleteProject = async(req , res)=>{
     try{
         const userId = req.user;
