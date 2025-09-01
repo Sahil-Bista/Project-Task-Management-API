@@ -1,4 +1,4 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import mongoose from "mongoose";
 
 export const createProjectValidation = [
@@ -27,3 +27,10 @@ export const createProjectValidation = [
             return true;
         }),
 ]
+
+export const deleteProjectValidaiton = [
+    param("projectId")
+        .notEmpty()
+        .isMongoId()
+        .withMessage('The project Id must be a valid mongo object id')
+];

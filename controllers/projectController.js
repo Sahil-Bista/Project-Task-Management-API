@@ -3,11 +3,7 @@ import { ProjectModel } from "../models/Project.js";
 export const createProject = async(req , res)=>{
     try{
         const userId = req.user;
-        console.log(userId);
         const { name, description, members } = req.body;
-        if( !name || !description){
-            return res.status(400).json({msg:'Name and description required'})
-        }
         const duplicate = await ProjectModel.findOne({name, description});
         if(duplicate){
             return res.status(409).json({msg:'Project with the same name and description already exists'});
@@ -19,3 +15,27 @@ export const createProject = async(req , res)=>{
         return res.status(500).json({msg:"Internal Server Error"});
     }
 }
+
+export const deleteProject = async(req , res)=>{
+    try{
+        const userId = req.user;
+        const userRole = req.roles;
+        const isAdmin = userRole.includes('Admin');
+        console.log(isAdmin);
+        const {projectId} = req.params;
+        const foundProject = await ProjectModel.findById(projectId);
+        if(!foundProject){
+            return res.status(404).json({msg : 'No Such Project'});
+        }
+        const projectOwner = foundProject.owner;
+        if (projectOwner.toString() !== userId && !isAdmin){
+            return res.status(403).json({msg:'User unauthorized to delete the project'})
+        }
+        const deletedProject = await ProjectModel.findByIdAndDelete(projectId);
+        return res.json({msg:'Project deleted successfully', data : deletedProject});
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({msg:"Internal Server Error"});
+    }
+}
+
