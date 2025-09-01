@@ -68,7 +68,7 @@ export const updateProjectDetails = async(req, res)=>{
         }
         foundProject.name = name;
         foundProject.description = description;
-        foundProject.save();
+        await foundProject.save();
         return res.json({msg:'Project updated successfully', data : foundProject});
     }catch(err){
         console.log(err);
