@@ -41,3 +41,22 @@ export const getProjectValidaiton = [
         .isMongoId()
         .withMessage('The project Id must be a valid mongo object id')
 ];
+
+export const updateProjectValidation = [
+    body("name")
+        .trim()
+        .escape()
+        .notEmpty()
+        .withMessage('Project Name is required'),
+    
+    body("description")
+        .trim()
+        .escape()
+        .isLength({min : 20})
+        .withMessage('Project Descrtiption should at least be 20 letters long'),
+    
+    param("projectId")
+        .notEmpty()
+        .isMongoId()
+        .withMessage('The project Id must be a valid mongo object id')
+]

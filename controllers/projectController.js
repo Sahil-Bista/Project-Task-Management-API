@@ -51,6 +51,31 @@ export const getProjectDetails = async(req , res)=>{
     }
 }
 
+export const updateProjectDetails = async(req, res)=>{
+    try{
+        const userId = req.user;
+        const userRole = req.roles;
+        const isAdmin = userRole.includes('Admin');
+        const {projectId} = req.params;
+        const { name, description } = req.body;
+        const foundProject = await ProjectModel.findById(projectId);
+        if(!foundProject){
+            return res.status(404).json({msg : 'No Such Project'});
+        }
+        const projectOwner = foundProject.owner;
+        if (projectOwner.toString() !== userId && !isAdmin){
+            return res.status(403).json({msg:'User unauthorized to update the project'})
+        }
+        foundProject.name = name;
+        foundProject.description = description;
+        foundProject.save();
+        return res.json({msg:'Project updated successfully', data : foundProject});
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({msg:'interal server error'});
+    }
+}
+
 export const deleteProject = async(req , res)=>{
     try{
         const userId = req.user;
