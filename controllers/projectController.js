@@ -16,6 +16,20 @@ export const createProject = async(req , res)=>{
     }
 }
 
+export const getUserProject = async(req , res)=>{
+    try{
+        const userId = req.user;
+        const foundProject = await ProjectModel.find({members : userId});
+        if(foundProject.length === 0){
+            return res.status(404).json({msg : 'No Project with you in it'});
+        }
+        return res.json({msg:'Project retrieved successfully', data : foundProject});
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({msg:"Internal Server Error"});
+    }
+}
+
 export const deleteProject = async(req , res)=>{
     try{
         const userId = req.user;

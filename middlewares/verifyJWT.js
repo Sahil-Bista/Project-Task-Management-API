@@ -9,7 +9,6 @@ export const verifyJWT = async(req , res, next)=>{
         process.env.ACCESS_TOKEN_SECRET,
         (err,decoded) => {
             if(err) return res.sendStatus(401);
-            console.log(decoded);
             req.user = decoded.UserInfo.user;
             req.roles = decoded.UserInfo.role;
             next();
