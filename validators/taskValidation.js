@@ -1,4 +1,4 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import mongoose from "mongoose";
 
 export const createTaskValidator = [
@@ -42,4 +42,11 @@ export const createTaskValidator = [
         }
         return true;
         }) 
+]
+
+export const deleteTaskValidator = [
+    param("taskId")
+        .notEmpty()
+        .isMongoId()
+        .withMessage('Task Id must be a valid mongo Id')
 ]

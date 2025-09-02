@@ -40,3 +40,29 @@ export const createTask = async(req , res)=>{
         return res.status(500).json({msg:'Internal Server error'})
     }   
 }
+
+export const deleteTask = async(req,res) =>{
+    try{
+        const userId = req.user;
+        const {taskId} = req.params;
+        const task = await TaskModel.findById(taskId);
+        if(!task){
+            return res.status(404).json({msg:'No such task present'});
+        }
+        const projectId = task.projectId;
+        const foundProject = await ProjectModel.findById(projectId);
+        console.log(foundProject);
+        if(!foundProject){
+            return res.status(404).json({msg:'No such project available'});
+        }
+        const owner = foundProject.owner;
+        if(owner.toString() !== userId){
+            return res.status(403).json({msg:'User unauthorized to delete task from this project'});
+        }
+        const deletedTask = await TaskModel.findByIdAndDelete(taskId);
+        return res.json({msg:'Task deleted successfully',data : deletedTask});
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({msg:'Internal Server error'})
+    }  
+}
