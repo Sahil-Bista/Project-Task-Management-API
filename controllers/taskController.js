@@ -3,7 +3,7 @@ import { TaskModel } from "../models/Task.js";
 
 export const createTask = async(req , res)=>{
     try{
-        const userId = req.userId;
+        const userId = req.user;
         const {name,description, assignedTo, projectId, dueDate} = req.body;
         const foundProject = await ProjectModel.findById(projectId);
         if(!foundProject){
@@ -16,15 +16,17 @@ export const createTask = async(req , res)=>{
         const projectMembers = foundProject.members;
         const validMembers = [];
         const invalidMembers = [];
-        await promise.all(
-            assignedTo.map((assignees)=>{
-                if(projectMembers.includes(assignees)){
-                    validMembers.push(assignees);
-                }else{
-                    invalidMembers.push(assignees);
-                }
-            })
-        );
+        if(assignedTo && assignedTo.length >= 0){
+            await Promise.all(
+                assignedTo.map((assignees)=>{
+                    if (projectMembers.some(member => member.toString() === assignees)){
+                        validMembers.push(assignees);
+                    }else{
+                        invalidMembers.push(assignees);
+                    }
+                })
+            );
+        }
         const duplicate = await TaskModel.findOne({name, description, projectId});
         if(duplicate){
             return res.status(409).json({msg:'The same task already exists in the project'});

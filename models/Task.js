@@ -15,10 +15,12 @@ const TaskSchema = new mongoose.Schema({
         default : 'To-do',
         enum : ['To-do','In-progress','Completed']
     },
-    assignedTo : {
-        type : mongoose.Schema.Types.ObjectId,
-        ref : 'User'
-    },
+    assignedTo :[
+        {
+            type : mongoose.Schema.Types.ObjectId,
+            ref : 'User'
+        }
+    ],
     projectId : {
         type : mongoose.Schema.Types.ObjectId,
         ref : 'Project',
