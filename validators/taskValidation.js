@@ -44,6 +44,24 @@ export const createTaskValidator = [
         }) 
 ]
 
+export const updateTaskStatusValidator = [
+    body("taskId")
+        .notEmpty()
+        .isMongoId()
+        .withMessage('Task Id must be a valid mongo Id'),
+
+    body("status")
+        .notEmpty()
+        .withMessage('Please enter a valid status')
+        .custom((status)=>{
+            const allowed_status = ['To-do','In-progress','Completed'];
+            if(!allowed_status.includes(status)){
+                throw new Error ('Invalid status');
+            }
+            return true;
+        })
+]
+
 export const deleteTaskValidator = [
     param("taskId")
         .notEmpty()

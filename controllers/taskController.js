@@ -41,6 +41,27 @@ export const createTask = async(req , res)=>{
     }   
 }
 
+export const UpdateTaskStatus = async(req,res)=>{
+    try{
+        const userId = req.user;
+        const {taskId, status} = req.body;
+        const task = await TaskModel.findById(taskId);
+        if(!task){
+            return res.status(404).json({msg : 'No such task found'})
+        }
+        const taskAssignees = task.assignedTo;
+        if(!taskAssignees.includes(userId)){
+            return res.status(403).json({msg:'User unauthorized to update task status'});
+        }
+        task.status = status;
+        await task.save()
+        return res.json({msg:'Task status updated successfully', data : task})
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({msg:'Internal Server error'})
+    }  
+}
+
 export const deleteTask = async(req,res) =>{
     try{
         const userId = req.user;
