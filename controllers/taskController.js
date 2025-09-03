@@ -66,6 +66,29 @@ export const getTaskDetails = async(req,res)=>{
     }  
 }
 
+export const getProjectSpecificTasks = async(req,res)=>{
+    try{
+        const userId = req.user;
+        const {projectId} = req.params;
+        const project = await ProjectModel.findById(projectId);
+        if(!project){
+            return res.status(404).json({msg : 'No such project found'});
+        } 
+        const projectMembers = project.members;
+        if(!projectMembers.includes(userId)){
+            return res.status(403).json({msg:'User unauthorized to get task list for the project'});
+        }
+        const task = await TaskModel.find({projectId});
+        if(!task){
+            return res.status(204).json({msg:'No tasks have been created within this project'})
+        }
+        return res.json({msg:'Task list retrieved', data : task});
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({msg:'Internal Server error'})
+    } 
+}
+
 export const UpadateTaskDetails = async(req,res)=>{
     try{
         const userId = req.user;

@@ -122,3 +122,10 @@ export const getTaskValidator = [
         .isMongoId()
         .withMessage('Task Id must be a valid mongo Id')
 ]
+
+export const getTaskListValidator = [
+    param("projectId")
+        .notEmpty()
+        .isMongoId()
+        .withMessage('Task Id must be a valid mongo Id')
+]
