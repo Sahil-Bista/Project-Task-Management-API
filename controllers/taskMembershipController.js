@@ -50,7 +50,39 @@ export const addTaskMembership = async(req , res) =>{
 
 export const removeTaskMembership = async(req , res) =>{
     try{
-
+        const userId = req.user;
+        const { taskId, membersToRemove } = req.body;
+        const task = await TaskModel.findById(taskId);
+        if(!task){
+            return res.status(400).json({msg:'No such task found, please enter a valid task Id'});
+        }
+        const projectId = task.projectId;
+        const project = await ProjectModel.findById(projectId);
+        if(!project){
+            return res.status(400).json({msg:'No such project found'});
+        }
+        const projectOwner = project.owner;
+        const projectMembers = project.members;
+        if(projectOwner.toString() !== userId){
+            return res.status(403).json({msg:'User unauthorized to remove members from the task'});
+        }
+        const validMembers = [];
+        const invalidMembers = [];
+        await Promise.all(
+            membersToRemove.map((member)=>{
+                const memberIds = new mongoose.Types.ObjectId(member);
+                if(projectMembers.some((projectMember)=>projectMember.equals(memberIds))){
+                    validMembers.push(member)
+                }else{
+                    invalidMembers.push(member);
+                }
+            })
+        )
+        let assignees  = task.assignedTo;
+        assignees = assignees.filter((assigne)=>!validMembers.includes(assigne.toString()));
+        task.assignedTo = assignees;
+        await task.save();
+        return res.json({msg:'Members removed from task successfully', data : task, invalidMembers: invalidMembers});
     }catch(err){
         console.error(err);
         return res.status(500).json({msg:'Internal Server Error'});
