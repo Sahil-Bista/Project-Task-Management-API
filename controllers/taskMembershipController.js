@@ -78,9 +78,7 @@ export const removeTaskMembership = async(req , res) =>{
                 }
             })
         )
-        let assignees  = task.assignedTo;
-        assignees = assignees.filter((assigne)=>!validMembers.includes(assigne.toString()));
-        task.assignedTo = assignees;
+        task.assignedTo =  assignees.filter((assigne)=>!validMembers.includes(assigne.toString()));
         await task.save();
         return res.json({msg:'Members removed from task successfully', data : task, invalidMembers: invalidMembers});
     }catch(err){
