@@ -1,4 +1,5 @@
 import { ProjectModel } from "../models/Project.js";
+import { TaskModel } from "../models/Task.js";
 
 export const createProject = async(req , res)=>{
     try{
@@ -91,6 +92,8 @@ export const deleteProject = async(req , res)=>{
             return res.status(403).json({msg:'User unauthorized to delete the project'})
         }
         const deletedProject = await ProjectModel.findByIdAndDelete(projectId);
+        //works even with 0 tasks
+        await TaskModel.deleteMany({projectId: projectId});
         return res.json({msg:'Project deleted successfully', data : deletedProject});
     }catch(err){
         console.log(err);
