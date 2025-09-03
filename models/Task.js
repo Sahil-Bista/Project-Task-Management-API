@@ -29,9 +29,6 @@ const TaskSchema = new mongoose.Schema({
     dueDate : {
         type : Date,
         required : true
-    },
-    completedDate : {
-        type : Date
     }
 });
 

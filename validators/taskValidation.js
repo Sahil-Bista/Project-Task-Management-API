@@ -44,6 +44,53 @@ export const createTaskValidator = [
         }) 
 ]
 
+export const updateTaskValidator = [
+        
+    body("taskId")
+        .notEmpty()
+        .isMongoId()
+        .withMessage('Project Id must be a valid mongoose object'),
+
+    body("name")
+        .optional()
+        .trim()
+        .escape()
+        .notEmpty()
+        .withMessage('Please enter a valid name'),
+
+    body("description")
+        .optional()
+        .escape()
+        .isLength({min : 20})
+        .withMessage("Task description must be at least 20 letters"),
+
+    
+    body("status")
+        .optional()
+        .notEmpty()
+        .withMessage('Please enter a valid status')
+        .custom((status)=>{
+            const allowed_status = ['To-do','In-progress','Completed'];
+            if(!allowed_status.includes(status)){
+                throw new Error ('Invalid status');
+            }
+            return true;
+        }),
+
+    body("dueDate")
+        .optional()
+        .isISO8601().
+        withMessage("Due date must be a valid date in ISO8601 format")
+        .custom((value) => {
+        const inputDate = new Date(value);
+        const now = new Date();
+        if (inputDate <= now) {
+            throw new Error("Due date must be in the future");
+        }
+        return true;
+        }) 
+]
+
 export const updateTaskStatusValidator = [
     body("taskId")
         .notEmpty()
@@ -63,6 +110,13 @@ export const updateTaskStatusValidator = [
 ]
 
 export const deleteTaskValidator = [
+    param("taskId")
+        .notEmpty()
+        .isMongoId()
+        .withMessage('Task Id must be a valid mongo Id')
+]
+
+export const getTaskValidator = [
     param("taskId")
         .notEmpty()
         .isMongoId()
