@@ -147,7 +147,7 @@ export const UpdateTaskStatus = async(req,res)=>{
         }
         task.status = status;
         await task.save()
-        io.to(project).emit('taskStatusUpdate',{name : task.name, status : task.status})
+        io.to(projectId.toString()).emit('taskStatusUpdate',{name : task.name, status : task.status})
         return res.json({msg:'Task status updated successfully', data : task})
     }catch(err){
         console.log(err);
@@ -174,7 +174,7 @@ export const deleteTask = async(req,res) =>{
             return res.status(403).json({msg:'User unauthorized to delete task from this project'});
         }
         const deletedTask = await TaskModel.findByIdAndDelete(taskId);
-        io.to(projectId).emit('taskDeletion', deletedTask);
+        io.to(projectId.toString()).emit('taskDeletion', deletedTask);
         return res.json({msg:'Task deleted successfully',data : deletedTask});
     }catch(err){
         console.log(err);

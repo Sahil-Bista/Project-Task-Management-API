@@ -30,7 +30,7 @@ let server;
 export const startServer= async(PORT)=>{
     try{
         await connectDB();
-        server = app.listen(PORT, ()=>{
+        server = httpServer.listen(PORT, ()=>{
             console.log(`App is listening on PORT ${PORT}`);
         })
     }catch(error){
