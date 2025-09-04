@@ -5,6 +5,7 @@ export const createTask = async(req , res)=>{
     try{
         const userId = req.user;
         const {name,description, assignedTo, projectId, dueDate} = req.body;
+        console.log(projectId);
         const foundProject = await ProjectModel.findById(projectId);
         if(!foundProject){
             return res.status(404).json({msg:'No such project available'});

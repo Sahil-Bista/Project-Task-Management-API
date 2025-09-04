@@ -68,7 +68,7 @@ export const removeMembersFromProject = async(req, res)=>{
         );
         for(const task of tasks){
             const taskMembers = task.assignedTo;
-            task.assignedTo =  taskMembers.filter((member)=> !validMembers.includes(member.toString()));;
+            task.assignedTo =  taskMembers.filter((member)=> !validMembers.includes(member.toString()));
             await task.save();
         }
         foundProject.members = projectMembers.filter((member)=> !validMembers.includes(member.toString()));
