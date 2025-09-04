@@ -6,7 +6,7 @@ const socket = io('http://localhost:3000');
 socket.on('connect',()=>{
     console.log('Client connected');
     //here a valid project Id that is also in the req body for creating/ updating or delting tasks will be required
-    socket.emit('joinProject',"68b7d2c0cfa5556ac06b39ee");
+    socket.emit('joinProject',ProjectId);
 });
 
 socket.on('taskCreated',(task)=>{
