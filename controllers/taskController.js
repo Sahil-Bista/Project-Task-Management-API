@@ -1,5 +1,6 @@
 import { ProjectModel } from "../models/Project.js";
 import { TaskModel } from "../models/Task.js";
+import { io } from '../server.js';
 
 export const createTask = async(req , res)=>{
     try{
@@ -35,6 +36,7 @@ export const createTask = async(req , res)=>{
         const newTask = await TaskModel.create({
             name, description,  assignedTo : validMembers, projectId, dueDate
         });
+        io.to(projectId).emit('taskCreated', newTask)
         return res.json({msg : 'Task created successfully', data : newTask, invalidMembers : invalidMembers});
     }catch(err){
         console.log(err);
@@ -145,6 +147,7 @@ export const UpdateTaskStatus = async(req,res)=>{
         }
         task.status = status;
         await task.save()
+        io.to(project).emit('taskStatusUpdate',{name : task.name, status : task.status})
         return res.json({msg:'Task status updated successfully', data : task})
     }catch(err){
         console.log(err);
@@ -171,6 +174,7 @@ export const deleteTask = async(req,res) =>{
             return res.status(403).json({msg:'User unauthorized to delete task from this project'});
         }
         const deletedTask = await TaskModel.findByIdAndDelete(taskId);
+        io.to(projectId).emit('taskDeletion', deletedTask);
         return res.json({msg:'Task deleted successfully',data : deletedTask});
     }catch(err){
         console.log(err);
