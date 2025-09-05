@@ -1,9 +1,9 @@
 import { TaskModel } from "../models/Task.js";
 import {ProjectModel} from "../models/Project.js"
 import mongoose from "mongoose";
+import { catchAsync } from "../utils/ErrorHandler.js";
 
-export const addTaskMembership = async(req , res) =>{
-    try{
+export const addTaskMembership = catchAsync(async(req , res) =>{
         const userId = req.user;
         const { taskId, assignedTo } = req.body;
         const task = await TaskModel.findById(taskId);
@@ -42,14 +42,9 @@ export const addTaskMembership = async(req , res) =>{
         task.taskAssignees == taskAssignees;
         await task.save()
         return res.json({msg : 'Task assigned to users', data : task, inValidMembers : inValidMembers});
-    }catch(err){
-        console.error(err);
-        return res.status(500).json({msg:'Internal Server Error'});
-    }
-}
+});
 
-export const removeTaskMembership = async(req , res) =>{
-    try{
+export const removeTaskMembership = catchAsync(async(req , res) =>{
         const userId = req.user;
         const { taskId, membersToRemove } = req.body;
         const task = await TaskModel.findById(taskId);
@@ -81,8 +76,4 @@ export const removeTaskMembership = async(req , res) =>{
         task.assignedTo =  assignees.filter((assigne)=>!validMembers.includes(assigne.toString()));
         await task.save();
         return res.json({msg:'Members removed from task successfully', data : task, invalidMembers: invalidMembers});
-    }catch(err){
-        console.error(err);
-        return res.status(500).json({msg:'Internal Server Error'});
-    }
-}
+});

@@ -1,9 +1,9 @@
 import { ProjectModel } from "../models/Project.js";
 import { TaskModel } from "../models/Task.js";
 import { io } from '../server.js';
+import { catchAsync } from "../utils/ErrorHandler.js";
 
-export const createTask = async(req , res)=>{
-    try{
+export const createTask = catchAsync(async(req , res)=>{
         const userId = req.user;
         const {name,description, assignedTo, projectId, dueDate} = req.body;
         console.log(projectId);
@@ -38,14 +38,9 @@ export const createTask = async(req , res)=>{
         });
         io.to(projectId).emit('taskCreated', newTask)
         return res.json({msg : 'Task created successfully', data : newTask, invalidMembers : invalidMembers});
-    }catch(err){
-        console.log(err);
-        return res.status(500).json({msg:'Internal Server error'})
-    }   
-}
+});
 
-export const getTaskDetails = async(req,res)=>{
-    try{
+export const getTaskDetails = catchAsync(async(req,res)=>{
         const userId = req.user;
         const {taskId} = req.params;
         const task = await TaskModel.findById(taskId);
@@ -62,15 +57,10 @@ export const getTaskDetails = async(req,res)=>{
         if(projectOwner.toString() !== userId && !taskAssignees.includes(userId)){
             return res.status(403).json({msg:'User unauthorized to get task details'});
         }
-        return res.json({msg:'Task details retirieved successfully', data : task});
-    }catch(err){
-        console.log(err);
-        return res.status(500).json({msg:'Internal Server error'})
-    }  
-}
+        return res.json({msg:'Task details retirieved successfully', data : task});  
+});
 
-export const getProjectSpecificTasks = async(req,res)=>{
-    try{
+export const getProjectSpecificTasks = catchAsync(async(req,res)=>{
         const userId = req.user;
         const {projectId} = req.params;
         const project = await ProjectModel.findById(projectId);
@@ -86,14 +76,9 @@ export const getProjectSpecificTasks = async(req,res)=>{
             return res.status(204).json({msg:'No tasks have been created within this project'})
         }
         return res.json({msg:'Task list retrieved', data : task});
-    }catch(err){
-        console.log(err);
-        return res.status(500).json({msg:'Internal Server error'})
-    } 
-}
+});
 
-export const UpadateTaskDetails = async(req,res)=>{
-    try{
+export const UpadateTaskDetails = catchAsync(async(req,res)=>{
         const userId = req.user;
         const {taskId, name, description, status, dueDate} = req.body;
         const task = await TaskModel.findById(taskId);
@@ -121,14 +106,9 @@ export const UpadateTaskDetails = async(req,res)=>{
             { new: true, runValidators: true } 
         );
         return res.json({ msg: 'Task updated successfully', data: updatedTask });
-    }catch(err){
-        console.log(err);
-        return res.status(500).json({msg:'Internal Server error'})
-    }  
-}
+});
 
-export const UpdateTaskStatus = async(req,res)=>{
-    try{
+export const UpdateTaskStatus = catchAsync(async(req,res)=>{
         const userId = req.user;
         const {taskId, status} = req.body;
         const task = await TaskModel.findById(taskId);
@@ -149,14 +129,9 @@ export const UpdateTaskStatus = async(req,res)=>{
         await task.save()
         io.to(projectId.toString()).emit('taskStatusUpdate',{name : task.name, status : task.status})
         return res.json({msg:'Task status updated successfully', data : task})
-    }catch(err){
-        console.log(err);
-        return res.status(500).json({msg:'Internal Server error'})
-    }  
-}
+});
 
-export const deleteTask = async(req,res) =>{
-    try{
+export const deleteTask = catchAsync(async(req,res) =>{
         const userId = req.user;
         const {taskId} = req.params;
         const task = await TaskModel.findById(taskId);
@@ -176,8 +151,4 @@ export const deleteTask = async(req,res) =>{
         const deletedTask = await TaskModel.findByIdAndDelete(taskId);
         io.to(projectId.toString()).emit('taskDeletion', deletedTask);
         return res.json({msg:'Task deleted successfully',data : deletedTask});
-    }catch(err){
-        console.log(err);
-        return res.status(500).json({msg:'Internal Server error'})
-    }  
-}
+});

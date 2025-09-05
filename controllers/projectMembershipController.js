@@ -1,9 +1,9 @@
 import { ProjectModel } from "../models/Project.js";
 import { UserModel } from "../models/User.js";
 import {TaskModel} from "../models/Task.js";
+import { catchAsync } from "../utils/ErrorHandler.js";
 
-export const addMembersToProject = async(req, res)=>{
-    try{
+export const addMembersToProject = catchAsync(async(req, res)=>{
         const userId = req.user;
         const {projectId} = req.params;
         const { members } = req.body;
@@ -33,14 +33,9 @@ export const addMembersToProject = async(req, res)=>{
         foundProject.members = projectMembers;
         await foundProject.save();
         return res.json({msg:'Member added to the project', data: foundProject, invalidMembers : {invalidMembers}});
-    }catch(err){
-        console.log(err);
-        return res.status(500).json({msg:'Internal Server error'});
-    }
-}
+});
 
-export const removeMembersFromProject = async(req, res)=>{
-    try{
+export const removeMembersFromProject = catchAsync(async(req, res)=>{
         const userId = req.user;
         const {projectId} = req.params;
         const { members } = req.body;
@@ -74,8 +69,4 @@ export const removeMembersFromProject = async(req, res)=>{
         foundProject.members = projectMembers.filter((member)=> !validMembers.includes(member.toString()));
         await foundProject.save();
         return res.json({msg:'Member removed from the project', data: foundProject, invalidMembers : {invalidMembers}});
-    }catch(err){
-        console.log(err);
-        return res.status(500).json({msg:'Internal Server error'});
-    }
-}
+});
