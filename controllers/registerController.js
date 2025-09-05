@@ -6,7 +6,9 @@ export const registerUser = catchAsync(async(req , res) =>{
     const {email ,password ,firstName ,lastName ,phoneNumber, roles} = req.body;
     const duplicate = await UserModel.findOne({email});
     if(duplicate){
-        return res.status(409).json({msg:'A user with the same email already exists'});
+        const error = new Error('A user with the same email already exists');
+        error.statusCode = 409;
+        throw error;    
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await UserModel.create({ email, password:hashedPassword, firstName, lastName, phoneNumber, roles});

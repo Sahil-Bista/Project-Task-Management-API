@@ -9,11 +9,15 @@ export const addMembersToProject = catchAsync(async(req, res)=>{
         const { members } = req.body;
         const foundProject = await ProjectModel.findById(projectId);
         if(!foundProject){
-            return res.status(404).json({msg:'No such project found'});
+            const error = new Error('No such project found');
+            error.statusCode = 404;
+            throw error; 
         }
         const projectOwner = foundProject.owner;
         if(projectOwner.toString() !== userId){
-            return res.status(403).json({msg:'User unauthorized to add members to the project'});
+            const error = new Error('Only the project owner can add members to the project');
+            error.statusCode = 403;
+            throw error; 
         }
         const projectMembers = foundProject.members;
         const invalidMembers = [];
@@ -41,12 +45,16 @@ export const removeMembersFromProject = catchAsync(async(req, res)=>{
         const { members } = req.body;
         const foundProject = await ProjectModel.findById(projectId);
         if(!foundProject){
-            return res.status(404).json({msg:'No such project found'});
+            const error = new Error('Project Not Found');
+            error.statusCode = 404;
+            throw error; 
         }
         const tasks = await TaskModel.find({projectId});
         const projectOwner = foundProject.owner;
         if(projectOwner.toString() !== userId){
-            return res.status(403).json({msg:'User unauthorized to add members to the project'});
+            const error = new Error('Only the project owner can remove members from the project');
+            error.statusCode = 403;
+            throw error; 
         }
         const projectMembers = foundProject.members;
         const validMembers = []

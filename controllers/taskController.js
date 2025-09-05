@@ -9,11 +9,15 @@ export const createTask = catchAsync(async(req , res)=>{
         console.log(projectId);
         const foundProject = await ProjectModel.findById(projectId);
         if(!foundProject){
-            return res.status(404).json({msg:'No such project available'});
+            const error = new Error('Project not found');
+            error.statusCode = 404;
+            throw error; 
         }
         const owner = foundProject.owner;
         if(owner.toString() !== userId){
-            return res.status(403).json({msg:'User unauthorized to add task to this project'});
+            const error = new Error('User unauthoruzed to add task to this project');
+            error.statusCode = 403;
+            throw error; 
         }
         const projectMembers = foundProject.members;
         const validMembers = [];
@@ -31,7 +35,9 @@ export const createTask = catchAsync(async(req , res)=>{
         }
         const duplicate = await TaskModel.findOne({name, description, projectId});
         if(duplicate){
-            return res.status(409).json({msg:'The same task already exists in the project'});
+            const error = new Error('Task wirh the same name, description already exists for this project');
+            error.statusCode = 409;
+            throw error; 
         }
         const newTask = await TaskModel.create({
             name, description,  assignedTo : validMembers, projectId, dueDate
@@ -45,17 +51,23 @@ export const getTaskDetails = catchAsync(async(req,res)=>{
         const {taskId} = req.params;
         const task = await TaskModel.findById(taskId);
         if(!task){
-            return res.status(404).json({msg : 'No such task found'})
+            const error = new Error('Task not found');
+            error.statusCode = 404;
+            throw error; 
         }
         const projectId = task.projectId;
         const project  = await ProjectModel.findById(projectId);
         if(!project){
-            return res.status(404).json({msg:'No such project available'});
+            const error = new Error('Project not found');
+            error.statusCode = 404;
+            throw error; 
         }
         const projectOwner = project.owner;
         const taskAssignees = task.assignedTo;
         if(projectOwner.toString() !== userId && !taskAssignees.includes(userId)){
-            return res.status(403).json({msg:'User unauthorized to get task details'});
+            const error = new Error('User unauthorized to get task details');
+            error.statusCode = 403;
+            throw error; 
         }
         return res.json({msg:'Task details retirieved successfully', data : task});  
 });
@@ -65,11 +77,15 @@ export const getProjectSpecificTasks = catchAsync(async(req,res)=>{
         const {projectId} = req.params;
         const project = await ProjectModel.findById(projectId);
         if(!project){
-            return res.status(404).json({msg : 'No such project found'});
+            const error = new Error('Project not found');
+            error.statusCode = 404;
+            throw error; 
         } 
         const projectMembers = project.members;
         if(!projectMembers.includes(userId)){
-            return res.status(403).json({msg:'User unauthorized to get task list for the project'});
+            const error = new Error('User unauthorized to get task list for the project');
+            error.statusCode = 403;
+            throw error; 
         }
         const task = await TaskModel.find({projectId});
         if(!task){
@@ -83,16 +99,22 @@ export const UpadateTaskDetails = catchAsync(async(req,res)=>{
         const {taskId, name, description, status, dueDate} = req.body;
         const task = await TaskModel.findById(taskId);
         if(!task){
-            return res.status(404).json({msg : 'No such task found'})
+            const error = new Error('Task not found');
+            error.statusCode = 404;
+            throw error; 
         }
         const projectId = task.projectId;
         const project  = await ProjectModel.findById(projectId);
         if(!project){
-            return res.status(404).json({msg:'No such project available'});
+            const error = new Error('Project not found');
+            error.statusCode = 404;
+            throw error; 
         }
         const projectOwner = project.owner;
         if(projectOwner.toString() !== userId){
-            return res.status(403).json({msg:'User unauthorized to update task description'});
+            const error = new Error('Task description can only be updated by the project owner');
+            error.statusCode = 403;
+            throw error; 
         }
         const newTask = {};
         if (name) newTask.name = name;
@@ -113,17 +135,23 @@ export const UpdateTaskStatus = catchAsync(async(req,res)=>{
         const {taskId, status} = req.body;
         const task = await TaskModel.findById(taskId);
         if(!task){
-            return res.status(404).json({msg : 'No such task found'})
+            const error = new Error('Task not found');
+            error.statusCode = 404;
+            throw error; 
         }
         const taskAssignees = task.assignedTo;
         const projectId = task.projectId;
         const project  = await ProjectModel.findById(projectId);
         if(!project){
-            return res.status(404).json({msg:'No such project available'});
+            const error = new Error('Project not found');
+            error.statusCode = 404;
+            throw error; 
         }
         const projectOwner = project.owner;
         if(projectOwner.toString() !== userId && !taskAssignees.includes(userId)){
-            return res.status(403).json({msg:'User unauthorized to get task details'});
+            const error = new Error('User unauthorized to get tas details');
+            error.statusCode = 403;
+            throw error; 
         }
         task.status = status;
         await task.save()
@@ -136,17 +164,22 @@ export const deleteTask = catchAsync(async(req,res) =>{
         const {taskId} = req.params;
         const task = await TaskModel.findById(taskId);
         if(!task){
-            return res.status(404).json({msg:'No such task present'});
+            const error = new Error('No such task found');
+            error.statusCode = 404;
+            throw error; 
         }
         const projectId = task.projectId;
         const foundProject = await ProjectModel.findById(projectId);
-        console.log(foundProject);
         if(!foundProject){
-            return res.status(404).json({msg:'No such project available'});
+            const error = new Error('Project not found');
+            error.statusCode = 404;
+            throw error; 
         }
         const owner = foundProject.owner;
         if(owner.toString() !== userId){
-            return res.status(403).json({msg:'User unauthorized to delete task from this project'});
+            const error = new Error('Only the project owner can delete tasks from the project');
+            error.statusCode = 403;
+            throw error; 
         }
         const deletedTask = await TaskModel.findByIdAndDelete(taskId);
         io.to(projectId.toString()).emit('taskDeletion', deletedTask);

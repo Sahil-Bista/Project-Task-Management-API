@@ -8,18 +8,24 @@ export const addTaskMembership = catchAsync(async(req , res) =>{
         const { taskId, assignedTo } = req.body;
         const task = await TaskModel.findById(taskId);
         if(!task){
-            return res.status(400).json({msg:'No such task found, please enter a valid task Id'});
+            const error = new Error('Task not found');
+            error.statusCode = 400;
+            throw error; 
         }
         const taskAssignees = task.assignedTo;
         const projectId = task.projectId;
         const project = await ProjectModel.findById(projectId);
         if(!project){
-            return res.status(400).json({msg:'No such project found'});
+            const error = new Error('Project not found');
+            error.statusCode = 400;
+            throw error; 
         }
         const projectOwner = project.owner;
         const projectMembers = project.members;
         if(projectOwner.toString() !== userId){
-            return res.status(403).json({msg:'User unauthorized to add members to the task'});
+            const error = new Error('Only the project owner can add members to the task');
+            error.statusCode = 403;
+            throw error; 
         }
         const validMember = [];
         const inValidMembers = [];
@@ -34,7 +40,9 @@ export const addTaskMembership = catchAsync(async(req , res) =>{
             })
         )
         if(validMember.length === 0){
-            return res.status(400).json({msg:'PLease enter users that are a part of the project to aasign the task to'})
+            const error = new Error('Only users that are a part of the project can be assigned a task in it');
+            error.statusCode = 400;
+            throw error; 
         }
         for (const member of validMember){
             taskAssignees.push(member);
@@ -49,17 +57,23 @@ export const removeTaskMembership = catchAsync(async(req , res) =>{
         const { taskId, membersToRemove } = req.body;
         const task = await TaskModel.findById(taskId);
         if(!task){
-            return res.status(400).json({msg:'No such task found, please enter a valid task Id'});
+            const error = new Error('Task not found');
+            error.statusCode = 404;
+            throw error; 
         }
         const projectId = task.projectId;
         const project = await ProjectModel.findById(projectId);
         if(!project){
-            return res.status(400).json({msg:'No such project found'});
+            const error = new Error('Project not found');
+            error.statusCode = 404;
+            throw error; 
         }
         const projectOwner = project.owner;
         const projectMembers = project.members;
         if(projectOwner.toString() !== userId){
-            return res.status(403).json({msg:'User unauthorized to remove members from the task'});
+            const error = new Error('Only the project owner can remove task members from the project');
+            error.statusCode = 403;
+            throw error; 
         }
         const validMembers = [];
         const invalidMembers = [];
